@@ -4,9 +4,9 @@ import java.util.Random;
  * A program to carry on conversations with a human user.
  * This version:
  *<ul><li>
- * 		Uses advanced search for keywords 
+ *         Uses advanced search for keywords 
  *</li><li>
- * 		Will transform statements as well as react to keywords
+ *         Will transform statements as well as react to keywords
  *</li></ul>
  * This version uses an array to hold the default responses.
  * @author Laurie White
@@ -15,9 +15,9 @@ import java.util.Random;
 public class NikolaTesla
 {
     /**
-     * Get a default greeting 	
+     * Get a default greeting     
      * @return a greeting
-     */	
+     */    
     public String getGreeting()
     {
         return "Hello, let's talk.";
@@ -60,11 +60,37 @@ public class NikolaTesla
         {
             response = transformIWantStatement(statement);
         }
-        else if (findKeyword(statement, "marr", 0) >= 0)
+        else if (findKeyword(statement, "marry", 0) >= 0
+        || findKeyword(statement, "married", 0) >= 0)
         {
             response = wereYouMarried(statement);
         }
 
+        else if (findKeyword(statement, "famous",0) >= 0 ||
+        findKeyword(statement, "known",0) >= 0)
+        {
+            response = famousStatement();
+        }
+
+        else if (findKeyword(statement, "can you make", 0) >= 0)
+        {
+            response = canYouMake(statement);
+        }
+        else if (findKeyword (statement, "my name is", 0) >= 0)
+        {
+            response = greetings(statement);
+        }
+        else if (findKeyword(statement, "hello", 0) >= 0 ||
+        findKeyword(statement, "hey", 0) >= 0 ||
+        findKeyword(statement, "Hi", 0) >= 0 )
+        {
+            response = "Greetings, what is your name?";
+        }
+        else if (findKeyword(statement, "my name is nikola tesla", 0) >= 0 || 
+                 findKeyword(statement, "i am nikola tesla", 0) >= 0 ) 
+        {
+            response = "You are me!";
+        }
         else
         {
 
@@ -98,9 +124,31 @@ public class NikolaTesla
         return response;
     }
 
+    /**
+     * Take a statement with "I want to <something>." and transform it into 
+     * "What would it mean to <something>?"
+     * @param statement the user statement, assumed to contain "I want to"
+     * @return the transformed statement
+     */
+    private String greetings(String statement)
+    {
+        //  Remove the final period, if there is one
+        statement = statement.trim();
+        String lastChar = statement.substring(statement
+                .length() - 1);
+        if (lastChar.equals("."))
+        {
+            statement = statement.substring(0, statement
+                .length() - 1);
+        }
+        int psnOfStatement = findKeyword (statement, "my name is", 0);
+        String restOfStatement = statement.substring(psnOfStatement + 10).trim();
+        return "Hello " + restOfStatement + ", Tell me more abour yourself.";
+    }
+
     private String wereYouMarried(String statement) 
     /**
-     * 
+     * <something> marry(ied) <something>
      */
     {
         statement = statement.trim();
@@ -112,12 +160,48 @@ public class NikolaTesla
         } else if (lastChar.equals(".")) {
             statement = statement.substring(0, statement.length() -1);
         }
-        int psnOfMarr = findKeyword (statement, "marr", 0);
-        String resOfStatement = statement.substring(psnOfMarr + 4).trim(); 
+        int psnOfMarry = findKeyword (statement, "marry", 0); //marry
+        int psnOfMarried = findKeyword (statement, "married",0); //maried
+        String resOfStatement = statement.substring(psnOfMarry + 5).trim();
+        String resOfStatement2 = statement.substring(psnOfMarried + 5).trim();
         return "I had no love life";
     }
-    
-        /**
+
+    private String [] randomFamousResponses = {"invented the first alternating current (AC) motor",
+            "developed AC generation and transmission technology",
+            "I basically created the Radio, Tesla Coil, Remote Control, Tesla Valve, Violet Ray, and Wireless Telegraphy",
+        };
+    private String famousStatement() 
+    /**
+     * 
+     */
+    {
+        Random k = new Random ();
+        return randomFamousResponses [k.nextInt(randomFamousResponses.length)];
+    }
+
+    private String canYouMake(String statement) 
+    /**
+     * Can you make <something>
+     */
+    {
+        statement = statement.trim();
+        String lastChar = statement.substring(statement.length() - 1);
+        if (lastChar.equals("?"))
+        {
+            statement = statement.substring(0, statement
+                .length() - 1);
+        } else if (lastChar.equals(".")) {
+            statement = statement.substring(0, statement.length() -1);
+        }
+        int psnOfStatement = findKeyword (statement, "can you make", 0);
+        String resOfStatement = statement.substring(psnOfStatement + 15).trim();
+        int psnOfMe = findKeyword (resOfStatement, "me", 0);
+        String removeMe = statement.substring(psnOfMe + 2).trim();
+        return "I probably can make " + resOfStatement + " if I came back alive.";
+    }
+
+    /**
      * Take a statement with "you <something> me" and transform it into 
      * "What makes you think that I <something> you?"
      * @param statement the user statement, assumed to contain "you" followed by "me"
